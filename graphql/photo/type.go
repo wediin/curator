@@ -5,15 +5,15 @@ import (
 )
 
 type photo struct {
-	ID            string   `json:"id"`
-	Contributor   string   `json:"contributor"`
-	Urls          []string `json:"urls"`
+	ID          string   `json:"id"`
+	Contributor string   `json:"contributor"`
+	Urls        []string `json:"urls"`
 }
 
 // FIXME: Mockup data
 var photos []photo = []photo{
 	photo{
-		ID: "5b9d0aeb92cf31ce0d8040df",
+		ID:          "5b9d0aeb92cf31ce0d8040df",
 		Contributor: "Kevin",
 		Urls: []string{
 			"https://drive.google.com/some-hash-tag",
@@ -24,8 +24,10 @@ var photos []photo = []photo{
 var photoType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Photo",
 	Fields: graphql.Fields{
-		"id":           &graphql.Field{Type: graphql.String},
-		"contributor":  &graphql.Field{Type: graphql.String},
-		"urls":         &graphql.Field{Type: graphql.NewList(graphql.String)},
+		"id":              &graphql.Field{Type: graphql.String},
+		"contributor":     &graphql.Field{Type: graphql.String},
+		"masked":          &graphql.Field{Type: graphql.Boolean},
+		"createtimestamp": &graphql.Field{Type: graphql.String},
+		"urls":            &graphql.Field{Type: graphql.NewList(graphql.String)},
 	},
 })
