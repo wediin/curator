@@ -1,0 +1,14 @@
+schema {
+    query: Query
+}
+type Query {
+    photos: [Photo]
+}
+
+type Photo {
+    id: ID
+    contributor: String
+    urls: [String]
+    timestamp: String
+    masked: Boolean
+}
