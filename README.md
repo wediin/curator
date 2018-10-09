@@ -2,6 +2,35 @@
 
 backend server for gallery project
 
+## Requirement
+
+* golang installed
+* add $GOPATH/bin to $PATH
+
+```
+export PATH=$PATH:$GOPATH/bin
+```
+
+## Usage
+
+* install go-bindata
+
+```
+make setup
+```
+
+* run server
+
+```
+make run
+```
+
+* build static binary
+
+```
+make
+```
+
 ## Controller
 
 ### Ping
