@@ -47,7 +47,9 @@ curl localhost:9527/ping
 
 Simple
 ```
-curl -F file=@123.jpeg localhost:9527/upload
+curl localhost:9527/upload \
+-F file=@123.jpeg \
+-F contributor=donaldTrump
 ```
 
 Full
@@ -62,6 +64,7 @@ curl 'http://localhost:9527/upload' \
 -H 'Referer: http://localhost:9527' \
 -H 'Connection: keep-alive' \
 -F file=@123.jpeg \
+-F contributor=donaldTrump \
 --compressed
 ```
 
