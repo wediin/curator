@@ -1,0 +1,12 @@
+[Unit]
+Description=Gallery api server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/curator
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+
