@@ -5,6 +5,7 @@ import (
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/wediin/curator/graphql/model"
+	"github.com/wediin/curator/lib/common"
 	"github.com/wediin/curator/lib/google"
 )
 
@@ -19,18 +20,17 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 	for _, item := range mediaItems {
 		photos = append(photos, &photoResolver{
 			photo: &model.Photo{
-				ID: item.Id,
-				Contributor: "elliottDefault",
-				Urls: []string{item.BaseUrl},
-				Timestamp: item.MediaMetadata.CreationTime,
-				Masked: false,
+				ID:          item.Id,
+				Contributor: "DefaultContributor",
+				Urls:        []string{item.BaseUrl},
+				Timestamp:   common.TransformRFC3339Time(item.MediaMetadata.CreationTime),
+				Masked:      false,
 			},
 		})
 	}
 
 	return &photos, nil
 }
-
 
 // Resolver
 type photoResolver struct {
@@ -63,4 +63,3 @@ func (r *photoResolver) Timestamp() *string {
 func (r *photoResolver) Masked() *bool {
 	return &r.photo.Masked
 }
-
