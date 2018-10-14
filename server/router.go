@@ -5,11 +5,13 @@ import (
 	"github.com/wediin/curator/controller"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(c Config) *gin.Engine {
 	r := gin.Default()
 
 	ping := new(controller.PingController)
-	upload := new(controller.UploadController)
+	upload := &controller.UploadController{
+		c.StorePath,
+	}
 	graphql := new(controller.GraphqlController)
 
 	r.GET("/ping", ping.GetController)

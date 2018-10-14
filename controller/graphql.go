@@ -5,8 +5,8 @@ import (
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
-	"github.com/wediin/curator/graphql/schema"
 	"github.com/wediin/curator/graphql/resolver"
+	"github.com/wediin/curator/graphql/schema"
 )
 
 type GraphqlController struct{}

@@ -8,50 +8,67 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/wediin/curator/lib/common"
 )
 
 const (
-	UploadFolder       = "uploadFolder"
-	FormFileField      = "file"
-	ContributorField   = "contributor"
-	DefaultContributor = "defaultContributor"
+	formFieldFile        = "file"
+	formFieldContributor = "contributor"
+	photoStoreName       = "photos"
+	defaultContributor   = "defaultContributor"
 )
 
-type UploadController struct{}
+type UploadController struct {
+	StorePath string
+}
 
 func (ctr *UploadController) PostController(c *gin.Context) {
-	file, handler, err := c.Request.FormFile(FormFileField)
+	file, handler, err := c.Request.FormFile(formFieldFile)
 	if err != nil {
-		fmt.Println(err)
+		c.Error(err)
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer file.Close()
 
-	saveFileName := genSaveFileName(handler.Filename, c.Request)
-	out, err := os.Create(saveFileName)
+	photoStorePath := ctr.StorePath + "/" + photoStoreName
+	if err := common.CreateDir(photoStorePath); err != nil {
+		c.Error(err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	contributor := c.Request.FormValue(formFieldContributor)
+	if len(contributor) == 0 {
+		contributor = defaultContributor
+	}
+
+	saveFilePath := genSaveFilePath(handler.Filename, photoStorePath, contributor)
+	out, err := os.Create(saveFilePath)
 	if err != nil {
-		fmt.Println(err)
+		c.Error(err)
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 	defer out.Close()
 
-	io.Copy(out, file)
+	_, err = io.Copy(out, file)
+	if err != nil {
+		c.Error(err)
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	c.String(http.StatusOK, "upload successful\n")
+	c.String(http.StatusOK, "upload successful")
 }
 
-func genSaveFileName(filename string, r *http.Request) string {
-	contributor := r.FormValue(ContributorField)
-	if len(contributor) == 0 {
-		contributor = DefaultContributor
-	}
+func genSaveFilePath(filename string, dir string, contributor string) string {
 	saveFileName := fmt.Sprintf(
-		"./%s/%s-%d-%s",
-		UploadFolder,
+		"%s/%s-%d-%s",
+		dir,
 		contributor,
 		time.Now().Unix(),
 		filename,
 	)
 	return saveFileName
-
 }
