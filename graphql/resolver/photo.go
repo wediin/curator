@@ -2,6 +2,10 @@ package resolver
 
 import (
 	"context"
+	"io/ioutil"
+	"log"
+	"strconv"
+	"time"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/wediin/curator/graphql/model"
@@ -29,6 +33,22 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 		})
 	}
 
+	// append local files
+	files, err := ioutil.ReadDir("uploadFolder")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		photos = append(photos, &photoResolver{
+			photo: &model.Photo{
+				ID:          strconv.FormatInt(time.Now().Unix(), 10),
+				Contributor: "localfolder",
+				Urls:        []string{"localhost:9527/usercontent/" + file.Name()},
+				Timestamp:   strconv.FormatInt(time.Now().Unix(), 10),
+				Masked:      false,
+			},
+		})
+	}
 	return &photos, nil
 }
 
