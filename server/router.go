@@ -14,6 +14,7 @@ func SetupRouter(c Config) *gin.Engine {
 	}
 	graphql := new(controller.GraphqlController)
 
+	r.Static("/usercontent", "./uploadFolder")
 	r.GET("/ping", ping.GetController)
 	r.POST("/upload", upload.PostController)
 	r.GET("/graphql", gin.WrapF(graphql.NewGraphiQLHandlerFunc()))
