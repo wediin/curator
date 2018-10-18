@@ -1,3 +1,4 @@
 /main
 /curator
 /graphql/schema/bindata.go
+/test

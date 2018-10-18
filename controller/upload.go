@@ -2,39 +2,42 @@ package controller
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wediin/curator/lib/common"
+	"github.com/wediin/curator/lib/db"
+	"github.com/wediin/curator/lib/file"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
 	formFieldFile        = "file"
 	formFieldContributor = "contributor"
-	photoStoreName       = "photos"
 	defaultContributor   = "defaultContributor"
 )
 
 type UploadController struct {
-	StorePath string
+	Url                  string
+	MongoServer          string
+	MongoDB              string
+	PhotoMongoCollection string
+	PhotoStorePath       string
+	PhotoRouter          string
+	PhotoDir             string
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
-	file, handler, err := c.Request.FormFile(formFieldFile)
+	f, handler, err := c.Request.FormFile(formFieldFile)
 	if err != nil {
-		c.Error(err)
-		c.String(http.StatusInternalServerError, err.Error())
+		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
-	defer file.Close()
+	defer f.Close()
 
-	photoStorePath := ctr.StorePath + "/" + photoStoreName
-	if err := common.CreateDir(photoStorePath); err != nil {
-		c.Error(err)
-		c.String(http.StatusInternalServerError, err.Error())
+	if err := common.CreateDir(ctr.PhotoStorePath); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -43,32 +46,38 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		contributor = defaultContributor
 	}
 
-	saveFilePath := genSaveFilePath(handler.Filename, photoStorePath, contributor)
-	out, err := os.Create(saveFilePath)
-	if err != nil {
-		c.Error(err)
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	defer out.Close()
+	id := bson.NewObjectId()
 
-	_, err = io.Copy(out, file)
+	photoFileName := fmt.Sprintf("%s-%s-%s", contributor, id.Hex(), handler.Filename)
+	photoFilePath := fmt.Sprintf("%s/%s", ctr.PhotoStorePath, photoFileName)
+
+	err = file.SaveFile(f, photoFilePath)
 	if err != nil {
-		c.Error(err)
-		c.String(http.StatusInternalServerError, err.Error())
+		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	c.String(http.StatusOK, "upload successful")
-}
+	client, err := db.NewClient(ctr.MongoServer)
+	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
 
-func genSaveFilePath(filename string, dir string, contributor string) string {
-	saveFileName := fmt.Sprintf(
-		"%s/%s-%d-%s",
-		dir,
-		contributor,
-		time.Now().Unix(),
-		filename,
-	)
-	return saveFileName
+	photo := db.ModelPhoto{
+		Contributor: contributor,
+		Urls: []string{
+			ctr.Url + ctr.PhotoRouter + "/" + photoFileName,
+		},
+		Time: time.Now(),
+		Mask: false,
+	}
+	photo.AssignId(id)
+
+	err = client.Insert(ctr.MongoDB, ctr.PhotoMongoCollection, photo)
+	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	statusOK(c, http.StatusOK, "upload successful")
 }

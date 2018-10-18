@@ -7,17 +7,29 @@ import (
 )
 
 var (
-	help      bool
-	debug     bool
-	port      int
-	storePath string
+	help                 bool
+	debug                bool
+	port                 int
+	url                  string
+	storePath            string
+	mongoServer          string
+	mongoDB              string
+	photoMongoCollection string
+	photoRouter          string
+	photoDir             string
 )
 
 func init() {
-	flag.BoolVar(&help, "h", false, "show this help")
-	flag.BoolVar(&debug, "d", false, "enable debug mode")
-	flag.IntVar(&port, "p", 9527, "port number")
-	flag.StringVar(&storePath, "s", "/usr/lib/curator/", "local storage path")
+	flag.BoolVar(&help, "help", false, "show this help")
+	flag.BoolVar(&debug, "debug", false, "enable debug mode")
+	flag.IntVar(&port, "port", 9527, "port number")
+	flag.StringVar(&url, "url", "http://localhost:9527", "url for client to access")
+	flag.StringVar(&storePath, "store-path", "/var/lib/curator/", "local storage path")
+	flag.StringVar(&mongoServer, "mongo-server", "mongodb://localhost:27017", "url to mongodb server")
+	flag.StringVar(&mongoDB, "mongo-db", "gallery", "mongo database name")
+	flag.StringVar(&photoMongoCollection, "photo-mongo-collection", "photos", "mongo collection name for photos")
+	flag.StringVar(&photoRouter, "photo-router", "/photos", "router path of photos")
+	flag.StringVar(&photoDir, "photo-dir", "photos", "directory name to store photos under store path")
 }
 
 func main() {
@@ -29,9 +41,15 @@ func main() {
 	}
 
 	config := server.Config{
-		Debug:     debug,
-		Port:      port,
-		StorePath: storePath,
+		Debug:                debug,
+		Port:                 port,
+		Url:                  url,
+		StorePath:            storePath,
+		MongoServer:          mongoServer,
+		MongoDB:              mongoDB,
+		PhotoMongoCollection: photoMongoCollection,
+		PhotoRouter:          photoRouter,
+		PhotoDir:             photoDir,
 	}
 	server.Init(config)
 }

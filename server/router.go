@@ -8,13 +8,21 @@ import (
 func SetupRouter(c Config) *gin.Engine {
 	r := gin.Default()
 
+	photoStorePath := c.StorePath + "/" + c.PhotoDir
+
 	ping := new(controller.PingController)
 	upload := &controller.UploadController{
-		c.StorePath,
+		Url:                  c.Url,
+		MongoServer:          c.MongoServer,
+		MongoDB:              c.MongoDB,
+		PhotoMongoCollection: c.PhotoMongoCollection,
+		PhotoStorePath:       photoStorePath,
+		PhotoRouter:          c.PhotoRouter,
+		PhotoDir:             c.PhotoDir,
 	}
 	graphql := new(controller.GraphqlController)
 
-	r.Static("/usercontent", "./uploadFolder")
+	r.Static(c.PhotoRouter, photoStorePath)
 	r.GET("/ping", ping.GetController)
 	r.POST("/upload", upload.PostController)
 	r.GET("/graphql", gin.WrapF(graphql.NewGraphiQLHandlerFunc()))
