@@ -80,7 +80,7 @@ query {
         id
         contributor
         urls
-        timestamp
+        time
         masked
     }
 }

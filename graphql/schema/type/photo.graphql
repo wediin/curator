@@ -2,6 +2,6 @@ type Photo {
     id: ID
     contributor: String
     urls: [String]
-    timestamp: String
+    time: Time
     masked: Boolean
 }

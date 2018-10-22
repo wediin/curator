@@ -1,3 +1,5 @@
+scalar Time
+
 schema {
     query: Query
 }

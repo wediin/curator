@@ -3,7 +3,6 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/wediin/curator/graphql/model"
@@ -29,7 +28,7 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 				ID:          photo.ID.Hex(),
 				Contributor: photo.Contributor,
 				Urls:        photo.Urls,
-				Timestamp:   strconv.FormatInt(photo.Time.Unix(), 10),
+				Time:        graphql.Time{photo.Time},
 				Masked:      photo.Masked,
 			},
 		})
@@ -61,8 +60,8 @@ func (r *photoResolver) Urls() *[]*string {
 	return &urls
 }
 
-func (r *photoResolver) Timestamp() *string {
-	return &r.photo.Timestamp
+func (r *photoResolver) Time() *graphql.Time {
+	return &r.photo.Time
 }
 
 func (r *photoResolver) Masked() *bool {
