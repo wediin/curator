@@ -37,3 +37,29 @@ func (client *Client) Insert(database string, collection string, document interf
 
 	return nil
 }
+
+func (client *Client) SelectPhotos(database string, collection string) ([]*ModelPhoto, error) {
+	err := client.Client.Connect(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+	defer client.Client.Disconnect(context.Background())
+
+	c := client.Client.Database(database).Collection(collection)
+
+	res, err := c.Find(context.Background(), nil)
+	defer res.Close(context.Background())
+
+	photos := make([]*ModelPhoto, 0)
+	for res.Next(context.Background()) {
+		photo := ModelPhoto{}
+		err := res.Decode(&photo)
+		if err != nil {
+			return nil, err
+		}
+
+		photos = append(photos, &photo)
+	}
+
+	return photos, nil
+}

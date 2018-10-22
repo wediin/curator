@@ -1,3 +1,7 @@
 package resolver
 
-type Resolver struct{}
+type Resolver struct {
+	MongoServer          string
+	MongoDB              string
+	PhotoMongoCollection string
+}

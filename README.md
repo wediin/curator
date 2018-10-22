@@ -72,7 +72,22 @@ curl 'http://localhost:9527/upload' \
 
 #### Photo
 
-POST
+##### Query
+
+```
+query {
+    photos {
+        id
+        contributor
+        urls
+        timestamp
+        masked
+    }
+}
+```
+
+
+### GraphQL query by curl
 
 ```
 curl -X POST -H 'Content-Type: application/json' -d '{"query": "{ photos { id,contributor,urls } }"}' localhost:9527/graphql

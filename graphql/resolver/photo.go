@@ -2,54 +2,39 @@ package resolver
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
+	"fmt"
 	"strconv"
-	"time"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/wediin/curator/graphql/model"
-	"github.com/wediin/curator/lib/common"
-	"github.com/wediin/curator/lib/google"
+	"github.com/wediin/curator/lib/db"
 )
 
 // Query
 func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
-	mediaItems, err := google.RetrieveSharedPhotos()
+	client, err := db.NewClient(r.MongoServer)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("photo: Fail to new db client, err: (%v)", err)
 	}
 
-	photos := make([]*photoResolver, 0)
-	for _, item := range mediaItems {
-		photos = append(photos, &photoResolver{
+	photos, err := client.SelectPhotos(r.MongoDB, r.PhotoMongoCollection)
+	if err != nil {
+		return nil, fmt.Errorf("photo: Fail to select photos, err: (%v)", err)
+	}
+
+	photoResolvers := make([]*photoResolver, 0)
+	for _, photo := range photos {
+		photoResolvers = append(photoResolvers, &photoResolver{
 			photo: &model.Photo{
-				ID:          item.Id,
-				Contributor: "DefaultContributor",
-				Urls:        []string{item.BaseUrl},
-				Timestamp:   common.TransformRFC3339Time(item.MediaMetadata.CreationTime),
-				Masked:      false,
+				ID:          photo.ID.Hex(),
+				Contributor: photo.Contributor,
+				Urls:        photo.Urls,
+				Timestamp:   strconv.FormatInt(photo.Time.Unix(), 10),
+				Masked:      photo.Masked,
 			},
 		})
 	}
-
-	// append local files
-	files, err := ioutil.ReadDir("uploadFolder")
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, file := range files {
-		photos = append(photos, &photoResolver{
-			photo: &model.Photo{
-				ID:          strconv.FormatInt(time.Now().Unix(), 10),
-				Contributor: "localfolder",
-				Urls:        []string{"localhost:9527/usercontent/" + file.Name()},
-				Timestamp:   strconv.FormatInt(time.Now().Unix(), 10),
-				Masked:      false,
-			},
-		})
-	}
-	return &photos, nil
+	return &photoResolvers, nil
 }
 
 // Resolver

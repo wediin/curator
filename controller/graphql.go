@@ -9,10 +9,18 @@ import (
 	"github.com/wediin/curator/graphql/schema"
 )
 
-type GraphqlController struct{}
+type GraphqlController struct {
+	MongoServer          string
+	MongoDB              string
+	PhotoMongoCollection string
+}
 
 func (ctr *GraphqlController) NewHandler() *relay.Handler {
-	s := graphql.MustParseSchema(schema.String(), &resolver.Resolver{})
+	s := graphql.MustParseSchema(schema.String(), &resolver.Resolver{
+		MongoServer:          ctr.MongoServer,
+		MongoDB:              ctr.MongoDB,
+		PhotoMongoCollection: ctr.PhotoMongoCollection,
+	})
 
 	return &relay.Handler{Schema: s}
 }

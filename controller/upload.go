@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/wediin/curator/lib/common"
 	"github.com/wediin/curator/lib/db"
 	"github.com/wediin/curator/lib/file"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -46,7 +46,7 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		contributor = defaultContributor
 	}
 
-	id := bson.NewObjectId()
+	id := objectid.New()
 
 	photoFileName := fmt.Sprintf("%s-%s-%s", contributor, id.Hex(), handler.Filename)
 	photoFilePath := fmt.Sprintf("%s/%s", ctr.PhotoStorePath, photoFileName)
@@ -64,14 +64,14 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	}
 
 	photo := db.ModelPhoto{
+		ID:          id,
 		Contributor: contributor,
 		Urls: []string{
 			ctr.Url + ctr.PhotoRouter + "/" + photoFileName,
 		},
-		Time: time.Now(),
-		Mask: false,
+		Time:   time.Now(),
+		Masked: false,
 	}
-	photo.AssignId(id)
 
 	err = client.Insert(ctr.MongoDB, ctr.PhotoMongoCollection, photo)
 	if err != nil {

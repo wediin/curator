@@ -3,17 +3,13 @@ package db
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
 )
 
 type ModelPhoto struct {
-	_id         bson.ObjectId
-	Contributor string
-	Urls        []string
-	Time        time.Time
-	Mask        bool
-}
-
-func (m *ModelPhoto) AssignId(id bson.ObjectId) {
-	m._id = id
+	ID          objectid.ObjectID `bson:"_id"`
+	Contributor string            `bson: "contributor"`
+	Urls        []string          `bson: "urls"`
+	Time        time.Time         `bson: "time"`
+	Masked      bool              `bson: "masked"`
 }

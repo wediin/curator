@@ -20,7 +20,11 @@ func SetupRouter(c Config) *gin.Engine {
 		PhotoRouter:          c.PhotoRouter,
 		PhotoDir:             c.PhotoDir,
 	}
-	graphql := new(controller.GraphqlController)
+	graphql := &controller.GraphqlController{
+		MongoServer:          c.MongoServer,
+		MongoDB:              c.MongoDB,
+		PhotoMongoCollection: c.PhotoMongoCollection,
+	}
 
 	r.Static(c.PhotoRouter, photoStorePath)
 	r.GET("/ping", ping.GetController)
