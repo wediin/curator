@@ -1,7 +1,9 @@
 package resolver
 
+import (
+	"github.com/wediin/curator/lib/db"
+)
+
 type Resolver struct {
-	MongoServer          string
-	MongoDB              string
-	PhotoMongoCollection string
+	PhotoClient *db.PhotoClient
 }

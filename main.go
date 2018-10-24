@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"log"
+	"os"
 
 	"github.com/wediin/curator/server"
 )
@@ -51,5 +53,11 @@ func main() {
 		PhotoRouter:          photoRouter,
 		PhotoDir:             photoDir,
 	}
-	server.Init(config)
+
+	if err := server.Init(config); err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	os.Exit(0)
 }

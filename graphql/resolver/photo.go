@@ -6,17 +6,11 @@ import (
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/wediin/curator/graphql/model"
-	"github.com/wediin/curator/lib/db"
 )
 
 // Query
 func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
-	client, err := db.NewPhotoClient(r.MongoServer, r.MongoDB, r.PhotoMongoCollection)
-	if err != nil {
-		return nil, fmt.Errorf("photo: Fail to new photo db client, err: (%v)", err)
-	}
-
-	photos, err := client.Select()
+	photos, err := r.PhotoClient.Select()
 	if err != nil {
 		return nil, fmt.Errorf("photo: Fail to select photos, err: (%v)", err)
 	}

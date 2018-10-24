@@ -7,19 +7,16 @@ import (
 	"github.com/graph-gophers/graphql-go/relay"
 	"github.com/wediin/curator/graphql/resolver"
 	"github.com/wediin/curator/graphql/schema"
+	"github.com/wediin/curator/lib/db"
 )
 
 type GraphqlController struct {
-	MongoServer          string
-	MongoDB              string
-	PhotoMongoCollection string
+	PhotoClient *db.PhotoClient
 }
 
 func (ctr *GraphqlController) NewHandler() *relay.Handler {
 	s := graphql.MustParseSchema(schema.String(), &resolver.Resolver{
-		MongoServer:          ctr.MongoServer,
-		MongoDB:              ctr.MongoDB,
-		PhotoMongoCollection: ctr.PhotoMongoCollection,
+		PhotoClient: ctr.PhotoClient,
 	})
 
 	return &relay.Handler{Schema: s}

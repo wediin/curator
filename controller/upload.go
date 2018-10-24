@@ -20,12 +20,10 @@ const (
 
 type UploadController struct {
 	Url                  string
-	MongoServer          string
-	MongoDB              string
-	PhotoMongoCollection string
 	PhotoStorePath       string
 	PhotoRouter          string
 	PhotoDir             string
+	PhotoClient          *db.PhotoClient
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
@@ -57,12 +55,6 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 
-	client, err := db.NewPhotoClient(ctr.MongoServer, ctr.MongoDB, ctr.PhotoMongoCollection)
-	if err != nil {
-		statusError(c, http.StatusInternalServerError, err)
-		return
-	}
-
 	photo := db.PhotoModel{
 		ID:          id,
 		Contributor: contributor,
@@ -73,7 +65,7 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		Masked: false,
 	}
 
-	err = client.Insert(&photo)
+	err = ctr.PhotoClient.Insert(&photo)
 	if err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
