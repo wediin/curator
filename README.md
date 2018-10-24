@@ -86,6 +86,17 @@ query {
 }
 ```
 
+```
+query {
+    photo(id: "5bcd8614061567c7d13b2b51") {
+        id
+        contributor
+        urls
+        time
+        masked
+    }
+}
+```
 
 ### GraphQL query by curl
 

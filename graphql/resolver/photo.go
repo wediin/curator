@@ -9,8 +9,29 @@ import (
 )
 
 // Query
+type photoArgs struct {
+	ID string
+}
+
+func (r *Resolver) Photo(ctx context.Context, args photoArgs) (*photoResolver, error) {
+	photo, err := r.PhotoClient.FindByID(args.ID)
+	if err != nil {
+		return nil, fmt.Errorf("photo: Fail to select photo by ID=[%v], err: (%v)", args.ID, err)
+	}
+
+	return &photoResolver{
+		photo: &model.Photo{
+			ID:          photo.ID.Hex(),
+			Contributor: photo.Contributor,
+			Urls:        photo.Urls,
+			Time:        graphql.Time{photo.Time},
+			Masked:      photo.Masked,
+		},
+	}, nil
+}
+
 func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
-	photos, err := r.PhotoClient.Select()
+	photos, err := r.PhotoClient.Find()
 	if err != nil {
 		return nil, fmt.Errorf("photo: Fail to select photos, err: (%v)", err)
 	}

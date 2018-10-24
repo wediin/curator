@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 
+	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
 )
 
@@ -39,7 +41,7 @@ func (c *PhotoClient) Insert(model *PhotoModel) error {
 	return nil
 }
 
-func (c *PhotoClient) Select() ([]*PhotoModel, error) {
+func (c *PhotoClient) Find() ([]*PhotoModel, error) {
 	collection, err := c.getCollection()
 	if err != nil {
 		return nil, err
@@ -60,6 +62,28 @@ func (c *PhotoClient) Select() ([]*PhotoModel, error) {
 	}
 
 	return photos, nil
+}
+
+func (c *PhotoClient) FindByID(id string) (*PhotoModel, error) {
+	collection, err := c.getCollection()
+	if err != nil {
+		return nil, err
+	}
+
+	objID, err := objectid.FromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.NewDocument(bson.EC.ObjectID("_id", objID))
+	res := collection.FindOne(context.Background(), filter)
+
+	photo := PhotoModel{}
+	err = res.Decode(&photo)
+	if err != nil {
+		return nil, err
+	}
+	return &photo, nil
 }
 
 func (c *PhotoClient) getCollection() (*mongo.Collection, error) {

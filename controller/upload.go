@@ -19,11 +19,11 @@ const (
 )
 
 type UploadController struct {
-	Url                  string
-	PhotoStorePath       string
-	PhotoRouter          string
-	PhotoDir             string
-	PhotoClient          *db.PhotoClient
+	Url            string
+	PhotoStorePath string
+	PhotoRouter    string
+	PhotoDir       string
+	PhotoClient    *db.PhotoClient
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
