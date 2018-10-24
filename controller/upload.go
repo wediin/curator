@@ -57,13 +57,13 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 
-	client, err := db.NewClient(ctr.MongoServer)
+	client, err := db.NewPhotoClient(ctr.MongoServer, ctr.MongoDB, ctr.PhotoMongoCollection)
 	if err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	photo := db.ModelPhoto{
+	photo := db.PhotoModel{
 		ID:          id,
 		Contributor: contributor,
 		Urls: []string{
@@ -73,7 +73,7 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		Masked: false,
 	}
 
-	err = client.Insert(ctr.MongoDB, ctr.PhotoMongoCollection, photo)
+	err = client.Insert(&photo)
 	if err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return

@@ -6,7 +6,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 )
 
-type ModelPhoto struct {
+type PhotoModel struct {
 	ID          objectid.ObjectID `bson:"_id"`
 	Contributor string            `bson: "contributor"`
 	Urls        []string          `bson: "urls"`

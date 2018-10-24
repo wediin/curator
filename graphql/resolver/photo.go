@@ -11,12 +11,12 @@ import (
 
 // Query
 func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
-	client, err := db.NewClient(r.MongoServer)
+	client, err := db.NewPhotoClient(r.MongoServer, r.MongoDB, r.PhotoMongoCollection)
 	if err != nil {
-		return nil, fmt.Errorf("photo: Fail to new db client, err: (%v)", err)
+		return nil, fmt.Errorf("photo: Fail to new photo db client, err: (%v)", err)
 	}
 
-	photos, err := client.SelectPhotos(r.MongoDB, r.PhotoMongoCollection)
+	photos, err := client.Select()
 	if err != nil {
 		return nil, fmt.Errorf("photo: Fail to select photos, err: (%v)", err)
 	}
