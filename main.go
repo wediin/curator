@@ -39,12 +39,11 @@ func main() {
 
 	if help {
 		flag.Usage()
-		return
+		os.Exit(0)
 	}
 
 	config := server.Config{
 		Debug:                debug,
-		Port:                 port,
 		Url:                  url,
 		StorePath:            storePath,
 		MongoServer:          mongoServer,
@@ -54,10 +53,12 @@ func main() {
 		PhotoDir:             photoDir,
 	}
 
-	if err := server.Init(config); err != nil {
+	server, err := server.NewServer(config)
+	if err != nil {
 		log.Fatal(err)
 		os.Exit(1)
 	}
 
+	server.Run(port)
 	os.Exit(0)
 }

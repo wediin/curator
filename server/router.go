@@ -6,7 +6,7 @@ import (
 	"github.com/wediin/curator/lib/db"
 )
 
-func SetupRouter(c Config) (*gin.Engine, error) {
+func newRouter(c Config) (*gin.Engine, error) {
 	r := gin.Default()
 
 	photoStorePath := c.StorePath + "/" + c.PhotoDir

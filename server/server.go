@@ -6,16 +6,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Init(c Config) error {
+type Server struct {
+	router *gin.Engine
+}
+
+func NewServer(c Config) (*Server, error) {
 	if !c.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	r, err := SetupRouter(c)
+
+	r, err := newRouter(c)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	port := strconv.Itoa(c.Port)
-	r.Run(":" + port)
-	return nil
+	return &Server {
+		router: r,
+	}, nil
+}
+
+func (s *Server) Run(port int) {
+	p := strconv.Itoa(port)
+	s.router.Run(":" + p)
 }
