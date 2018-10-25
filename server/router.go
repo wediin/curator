@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/wediin/curator/controller"
 	"github.com/wediin/curator/lib/db"
 )
@@ -32,6 +33,10 @@ func newRouter(c Config) (*gin.Engine, error) {
 	r.POST("/upload", upload.PostController)
 	r.GET("/graphql", gin.WrapF(graphql.NewGraphiQLHandlerFunc()))
 	r.POST("/graphql", gin.WrapH(graphql.NewHandler()))
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	r.Use(cors.New(corsConfig))
 
 	return r, nil
 }
