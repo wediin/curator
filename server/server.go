@@ -20,7 +20,7 @@ func NewServer(c Config) (*Server, error) {
 		return nil, err
 	}
 
-	return &Server {
+	return &Server{
 		router: r,
 	}, nil
 }

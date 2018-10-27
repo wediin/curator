@@ -3,6 +3,7 @@ package server
 type Config struct {
 	Debug                bool
 	Url                  string
+	WebPath              string
 	StorePath            string
 	MongoServer          string
 	MongoDB              string

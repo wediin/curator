@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
 	"github.com/wediin/curator/controller"
 	"github.com/wediin/curator/lib/db"
 )
@@ -33,6 +33,7 @@ func newRouter(c Config) (*gin.Engine, error) {
 		PhotoClient: photoClient,
 	}
 
+	r.Use(static.Serve("/", static.LocalFile(c.WebPath, true)))
 	r.Use(static.Serve(c.PhotoRouter, static.LocalFile(photoStorePath, false)))
 	r.GET("/ping", ping.GetController)
 	r.POST("/upload", upload.PostController)
