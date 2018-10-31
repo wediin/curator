@@ -10,7 +10,7 @@ type Server struct {
 	router *gin.Engine
 }
 
-func NewServer(c Config) (*Server, error) {
+func NewServer(c *Config) (*Server, error) {
 	if !c.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}

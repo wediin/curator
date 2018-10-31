@@ -8,7 +8,7 @@ import (
 	"github.com/wediin/curator/lib/db"
 )
 
-func newRouter(c Config) (*gin.Engine, error) {
+func newRouter(c *Config) (*gin.Engine, error) {
 	r := gin.Default()
 
 	corsConfig := cors.DefaultConfig()
