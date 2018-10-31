@@ -10,4 +10,5 @@ type Config struct {
 	PhotoMongoCollection string
 	PhotoRouter          string
 	PhotoDir             string
+	ThumbWidth           int
 }

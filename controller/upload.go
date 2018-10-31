@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,8 @@ const (
 	formFieldFile        = "file"
 	formFieldContributor = "contributor"
 	defaultContributor   = "defaultContributor"
+	originPath           = "origin"
+	thumbPath            = "thumb"
 )
 
 type UploadController struct {
@@ -24,6 +27,7 @@ type UploadController struct {
 	PhotoRouter    string
 	PhotoDir       string
 	PhotoClient    *db.PhotoClient
+	ThumbWidth     int
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
@@ -34,7 +38,9 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	}
 	defer f.Close()
 
-	if err := common.CreateDir(ctr.PhotoStorePath); err != nil {
+	originStorePath := filepath.Join(ctr.PhotoStorePath, originPath)
+	thumbStorePath := filepath.Join(ctr.PhotoStorePath, thumbPath)
+	if err := common.CreateMultiDir(originStorePath, thumbStorePath); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -47,10 +53,22 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	id := objectid.New()
 
 	photoFileName := fmt.Sprintf("%s-%s-%s", contributor, id.Hex(), handler.Filename)
-	photoFilePath := fmt.Sprintf("%s/%s", ctr.PhotoStorePath, photoFileName)
+	photoFilePath := filepath.Join(originStorePath, photoFileName)
+	thumbFilePath := filepath.Join(thumbStorePath, photoFileName)
 
-	err = file.SaveFile(f, photoFilePath)
+	if err = file.SaveFile(f, photoFilePath); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	thumbF, _, err := c.Request.FormFile(formFieldFile)
 	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+	defer thumbF.Close()
+
+	if err = file.SaveAsThumb(thumbF, thumbFilePath, ctr.ThumbWidth); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -59,14 +77,13 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		ID:          id,
 		Contributor: contributor,
 		Urls: []string{
-			ctr.Url + ctr.PhotoRouter + "/" + photoFileName,
+			ctr.Url + ctr.PhotoRouter + "/" + originPath + "/" + photoFileName,
 		},
 		Time:   time.Now(),
 		Masked: false,
 	}
 
-	err = ctr.PhotoClient.Insert(&photo)
-	if err != nil {
+	if err = ctr.PhotoClient.Insert(&photo); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
