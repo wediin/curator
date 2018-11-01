@@ -1,7 +1,8 @@
 type Photo {
     id: ID
     contributor: String
-    urls: [String]
+    originURL: String
+    thumbURL: String
     time: Time
     masked: Boolean
 }

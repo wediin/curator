@@ -14,8 +14,7 @@ func SaveAsThumb(src io.Reader, thumbFilePath string, width int) error {
 	}
 
 	img = imaging.Resize(img, width, 0, imaging.Lanczos)
-	err = imaging.Save(img, thumbFilePath)
-	if err != nil {
+	if err = imaging.Save(img, thumbFilePath); err != nil {
 		return err
 	}
 	return nil

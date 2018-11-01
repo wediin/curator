@@ -23,7 +23,8 @@ func (r *Resolver) Photo(ctx context.Context, args photoArgs) (*photoResolver, e
 		photo: &model.Photo{
 			ID:          photo.ID.Hex(),
 			Contributor: photo.Contributor,
-			Urls:        photo.Urls,
+			OriginURL:   photo.OriginURL,
+			ThumbURL:    photo.ThumbURL,
 			Time:        graphql.Time{photo.Time},
 			Masked:      photo.Masked,
 		},
@@ -42,7 +43,8 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 			photo: &model.Photo{
 				ID:          photo.ID.Hex(),
 				Contributor: photo.Contributor,
-				Urls:        photo.Urls,
+				OriginURL:   photo.OriginURL,
+				ThumbURL:    photo.ThumbURL,
 				Time:        graphql.Time{photo.Time},
 				Masked:      photo.Masked,
 			},
@@ -65,14 +67,12 @@ func (r *photoResolver) Contributor() *string {
 	return &r.photo.Contributor
 }
 
-func (r *photoResolver) Urls() *[]*string {
-	urls := make([]*string, len(r.photo.Urls))
+func (r *photoResolver) OriginURL() *string {
+	return &r.photo.OriginURL
+}
 
-	for i := range urls {
-		urls[i] = &r.photo.Urls[i]
-	}
-
-	return &urls
+func (r *photoResolver) ThumbURL() *string {
+	return &r.photo.ThumbURL
 }
 
 func (r *photoResolver) Time() *graphql.Time {

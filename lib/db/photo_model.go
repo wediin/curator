@@ -9,7 +9,8 @@ import (
 type PhotoModel struct {
 	ID          objectid.ObjectID `bson:"_id"`
 	Contributor string            `bson: "contributor"`
-	Urls        []string          `bson: "urls"`
+	OriginURL   string            `bson: "originURL"`
+	ThumbURL    string            `bson: "thumbURL"`
 	Time        time.Time         `bson: "time"`
 	Masked      bool              `bson: "masked"`
 }

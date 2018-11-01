@@ -76,11 +76,10 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	photo := db.PhotoModel{
 		ID:          id,
 		Contributor: contributor,
-		Urls: []string{
-			ctr.Url + ctr.PhotoRouter + "/" + originPath + "/" + photoFileName,
-		},
-		Time:   time.Now(),
-		Masked: false,
+		OriginURL:   common.JoinURL(ctr.Url, ctr.PhotoRouter, originPath, photoFileName),
+		ThumbURL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, thumbPath, photoFileName),
+		Time:        time.Now(),
+		Masked:      false,
 	}
 
 	if err = ctr.PhotoClient.Insert(&photo); err != nil {

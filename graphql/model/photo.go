@@ -7,7 +7,8 @@ import (
 type Photo struct {
 	ID          string       `json:"id"`
 	Contributor string       `json:"contributor"`
-	Urls        []string     `json:"urls"`
+	OriginURL   string       `json:"originURL"`
+	ThumbURL    string       `json:"thumbURL"`
 	Time        graphql.Time `json:"time"`
 	Masked      bool         `json:"masked"`
 }

@@ -79,7 +79,8 @@ query {
     photos {
         id
         contributor
-        urls
+        originURL
+        thumbURL
         time
         masked
     }
@@ -91,7 +92,8 @@ query {
     photo(id: "5bcd8614061567c7d13b2b51") {
         id
         contributor
-        urls
+        originURL
+        thumbURL
         time
         masked
     }
@@ -101,5 +103,5 @@ query {
 ### GraphQL query by curl
 
 ```
-curl -X POST -H 'Content-Type: application/json' -d '{"query": "{ photos { id,contributor,urls } }"}' localhost:9527/graphql
+curl -X POST -H 'Content-Type: application/json' -d '{"query": "{ photos { id,contributor,originURL,thumbURL } }"}' localhost:9527/graphql
 ```
