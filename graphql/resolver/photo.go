@@ -25,6 +25,7 @@ func (r *Resolver) Photo(ctx context.Context, args photoArgs) (*photoResolver, e
 			Contributor: photo.Contributor,
 			OriginURL:   photo.OriginURL,
 			ThumbURL:    photo.ThumbURL,
+			WebviewURL:  photo.WebviewURL,
 			Time:        graphql.Time{photo.Time},
 			Masked:      photo.Masked,
 		},
@@ -45,6 +46,7 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 				Contributor: photo.Contributor,
 				OriginURL:   photo.OriginURL,
 				ThumbURL:    photo.ThumbURL,
+				WebviewURL:  photo.WebviewURL,
 				Time:        graphql.Time{photo.Time},
 				Masked:      photo.Masked,
 			},
@@ -73,6 +75,10 @@ func (r *photoResolver) OriginURL() *string {
 
 func (r *photoResolver) ThumbURL() *string {
 	return &r.photo.ThumbURL
+}
+
+func (r *photoResolver) WebviewURL() *string {
+	return &r.photo.WebviewURL
 }
 
 func (r *photoResolver) Time() *graphql.Time {

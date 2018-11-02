@@ -11,6 +11,7 @@ type PhotoModel struct {
 	Contributor string            `bson: "contributor"`
 	OriginURL   string            `bson: "originURL"`
 	ThumbURL    string            `bson: "thumbURL"`
+	WebviewURL  string            `bson: "webviewURL"`
 	Time        time.Time         `bson: "time"`
 	Masked      bool              `bson: "masked"`
 }

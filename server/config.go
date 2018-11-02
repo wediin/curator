@@ -11,4 +11,5 @@ type Config struct {
 	PhotoRouter          string
 	PhotoDir             string
 	ThumbWidth           int
+	WebviewMaxLen        int
 }

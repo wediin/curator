@@ -3,6 +3,7 @@ type Photo {
     contributor: String
     originURL: String
     thumbURL: String
+    webviewURL: String
     time: Time
     masked: Boolean
 }

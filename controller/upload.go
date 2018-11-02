@@ -16,9 +16,10 @@ import (
 const (
 	formFieldFile        = "file"
 	formFieldContributor = "contributor"
-	defaultContributor   = "defaultContributor"
+	defaultContributor   = "default"
 	originPath           = "origin"
 	thumbPath            = "thumb"
+	webViewPath          = "webview"
 )
 
 type UploadController struct {
@@ -28,6 +29,7 @@ type UploadController struct {
 	PhotoDir       string
 	PhotoClient    *db.PhotoClient
 	ThumbWidth     int
+	WebviewMaxLen  int
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
@@ -40,7 +42,8 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 
 	originStorePath := filepath.Join(ctr.PhotoStorePath, originPath)
 	thumbStorePath := filepath.Join(ctr.PhotoStorePath, thumbPath)
-	if err := common.CreateMultiDir(originStorePath, thumbStorePath); err != nil {
+	webViewStorePath := filepath.Join(ctr.PhotoStorePath, webViewPath)
+	if err := common.CreateMultiDir(originStorePath, thumbStorePath, webViewStorePath); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -53,10 +56,11 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	id := objectid.New()
 
 	photoFileName := fmt.Sprintf("%s-%s-%s", contributor, id.Hex(), handler.Filename)
-	photoFilePath := filepath.Join(originStorePath, photoFileName)
+	originFilePath := filepath.Join(originStorePath, photoFileName)
 	thumbFilePath := filepath.Join(thumbStorePath, photoFileName)
+	webViewFilePath := filepath.Join(webViewStorePath, photoFileName)
 
-	if err = file.SaveFile(f, photoFilePath); err != nil {
+	if err = file.SaveFile(f, originFilePath); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -68,9 +72,44 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	}
 	defer thumbF.Close()
 
-	if err = file.SaveAsThumb(thumbF, thumbFilePath, ctr.ThumbWidth); err != nil {
+	if err = file.ResizePhoto(thumbF, thumbFilePath, ctr.ThumbWidth, 0); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
+	}
+
+	webViewF, _, err := c.Request.FormFile(formFieldFile)
+	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+	defer webViewF.Close()
+
+	photoWidth, photoHeight, err := file.GetPhotoSize(webViewF)
+	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	if _, err := webViewF.Seek(0, 0); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	if ctr.WebviewMaxLen > photoWidth && ctr.WebviewMaxLen > photoHeight {
+		if err = file.SaveFile(webViewF, webViewFilePath); err != nil {
+			statusError(c, http.StatusInternalServerError, err)
+			return
+		}
+	} else if photoWidth > photoHeight {
+		if err = file.ResizePhoto(webViewF, webViewFilePath, ctr.WebviewMaxLen, 0); err != nil {
+			statusError(c, http.StatusInternalServerError, err)
+			return
+		}
+	} else {
+		if err = file.ResizePhoto(webViewF, webViewFilePath, 0, ctr.WebviewMaxLen); err != nil {
+			statusError(c, http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	photo := db.PhotoModel{
@@ -78,6 +117,7 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		Contributor: contributor,
 		OriginURL:   common.JoinURL(ctr.Url, ctr.PhotoRouter, originPath, photoFileName),
 		ThumbURL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, thumbPath, photoFileName),
+		WebviewURL:  common.JoinURL(ctr.Url, ctr.PhotoRouter, webViewPath, photoFileName),
 		Time:        time.Now(),
 		Masked:      false,
 	}

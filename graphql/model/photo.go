@@ -9,6 +9,7 @@ type Photo struct {
 	Contributor string       `json:"contributor"`
 	OriginURL   string       `json:"originURL"`
 	ThumbURL    string       `json:"thumbURL"`
+	WebviewURL  string       `json:"webviewURL"`
 	Time        graphql.Time `json:"time"`
 	Masked      bool         `json:"masked"`
 }
