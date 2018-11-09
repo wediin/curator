@@ -2,13 +2,13 @@ package file
 
 import (
 	"image"
-	"io"
+	"mime/multipart"
 
 	"github.com/disintegration/imaging"
 )
 
-func ResizePhoto(src io.Reader, targetPath string, width int, height int) error {
-	img, _, err := image.Decode(src)
+func ResizePhoto(file multipart.File, targetPath string, width int, height int) error {
+	img, _, err := image.Decode(file)
 	if err != nil {
 		return err
 	}
@@ -17,5 +17,10 @@ func ResizePhoto(src io.Reader, targetPath string, width int, height int) error 
 	if err = imaging.Save(img, targetPath); err != nil {
 		return err
 	}
+
+	if _, err := file.Seek(0, 0); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -1,9 +1,9 @@
 type Photo {
     id: ID
     contributor: String
-    originURL: String
-    thumbURL: String
-    webviewURL: String
+    origin: PhotoURL
+    thumb: PhotoURL
+    webview: PhotoURL
     time: Time
     masked: Boolean
 }

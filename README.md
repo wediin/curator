@@ -76,32 +76,58 @@ curl 'http://localhost:9527/upload' \
 
 ```
 query {
-    photos {
-        id
-        contributor
-        originURL
-        thumbURL
-        time
-        masked
+  photos {
+    id
+    contributor
+    origin {
+      width
+      height
+      url
     }
+    thumb {
+      width
+      height
+      url
+    }
+    webview {
+      width
+      height
+      url
+    }
+    time
+    masked
+  }
 }
 ```
 
 ```
 query {
-    photo(id: "5bcd8614061567c7d13b2b51") {
-        id
-        contributor
-        originURL
-        thumbURL
-        time
-        masked
+  photo(id: "5bcd8614061567c7d13b2b51") {
+    id
+    contributor
+    origin {
+      width
+      height
+      url
     }
+    thumb {
+      width
+      height
+      url
+    }
+    webview {
+      width
+      height
+      url
+    }
+    time
+    masked
+  }
 }
 ```
 
 ### GraphQL query by curl
 
 ```
-curl -X POST -H 'Content-Type: application/json' -d '{"query": "{ photos { id,contributor,originURL,thumbURL } }"}' localhost:9527/graphql
+curl -X POST -H 'Content-Type: application/json' -d '{"query": "{ photos { id,contributor } }"}' localhost:9527/graphql
 ```

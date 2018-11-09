@@ -9,9 +9,15 @@ import (
 type PhotoModel struct {
 	ID          objectid.ObjectID `bson:"_id"`
 	Contributor string            `bson: "contributor"`
-	OriginURL   string            `bson: "originURL"`
-	ThumbURL    string            `bson: "thumbURL"`
-	WebviewURL  string            `bson: "webviewURL"`
+	Origin      PhotoURLModel     `bson: "origin"`
+	Thumb       PhotoURLModel     `bson: "thumb"`
+	Webview     PhotoURLModel     `bson: "webview"`
 	Time        time.Time         `bson: "time"`
 	Masked      bool              `bson: "masked"`
+}
+
+type PhotoURLModel struct {
+	Width  int32  `bson:"width"`
+	Height int32  `bson:"height"`
+	URL    string `bson:"url"`
 }

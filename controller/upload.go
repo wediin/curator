@@ -65,61 +65,66 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 
-	thumbF, _, err := c.Request.FormFile(formFieldFile)
-	if err != nil {
-		statusError(c, http.StatusInternalServerError, err)
-		return
-	}
-	defer thumbF.Close()
-
-	if err = file.ResizePhoto(thumbF, thumbFilePath, ctr.ThumbWidth, 0); err != nil {
-		statusError(c, http.StatusInternalServerError, err)
-		return
-	}
-
-	webViewF, _, err := c.Request.FormFile(formFieldFile)
-	if err != nil {
-		statusError(c, http.StatusInternalServerError, err)
-		return
-	}
-	defer webViewF.Close()
-
-	photoWidth, photoHeight, err := file.GetPhotoSize(webViewF)
+	photoWidth, photoHeight, err := file.GetPhotoSize(f)
 	if err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	if _, err := webViewF.Seek(0, 0); err != nil {
+	if err = file.ResizePhoto(f, thumbFilePath, ctr.ThumbWidth, 0); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	thumbWidth, thumbHeight, err := file.GetPhotoSizeByPath(thumbFilePath)
+	if err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	if ctr.WebviewMaxLen > photoWidth && ctr.WebviewMaxLen > photoHeight {
-		if err = file.SaveFile(webViewF, webViewFilePath); err != nil {
+		if err = file.SaveFile(f, webViewFilePath); err != nil {
 			statusError(c, http.StatusInternalServerError, err)
 			return
 		}
 	} else if photoWidth > photoHeight {
-		if err = file.ResizePhoto(webViewF, webViewFilePath, ctr.WebviewMaxLen, 0); err != nil {
+		if err = file.ResizePhoto(f, webViewFilePath, ctr.WebviewMaxLen, 0); err != nil {
 			statusError(c, http.StatusInternalServerError, err)
 			return
 		}
 	} else {
-		if err = file.ResizePhoto(webViewF, webViewFilePath, 0, ctr.WebviewMaxLen); err != nil {
+		if err = file.ResizePhoto(f, webViewFilePath, 0, ctr.WebviewMaxLen); err != nil {
 			statusError(c, http.StatusInternalServerError, err)
 			return
 		}
 	}
 
+	webViewWidth, webViewHeight, err := file.GetPhotoSizeByPath(webViewFilePath)
+	if err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
+
 	photo := db.PhotoModel{
 		ID:          id,
 		Contributor: contributor,
-		OriginURL:   common.JoinURL(ctr.Url, ctr.PhotoRouter, originPath, photoFileName),
-		ThumbURL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, thumbPath, photoFileName),
-		WebviewURL:  common.JoinURL(ctr.Url, ctr.PhotoRouter, webViewPath, photoFileName),
-		Time:        time.Now(),
-		Masked:      false,
+		Origin: db.PhotoURLModel{
+			Width:  int32(photoWidth),
+			Height: int32(photoHeight),
+			URL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, originPath, photoFileName),
+		},
+		Thumb: db.PhotoURLModel{
+			Width:  int32(thumbWidth),
+			Height: int32(thumbHeight),
+			URL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, thumbPath, photoFileName),
+		},
+		Webview: db.PhotoURLModel{
+			Width:  int32(webViewWidth),
+			Height: int32(webViewHeight),
+			URL:    common.JoinURL(ctr.Url, ctr.PhotoRouter, webViewPath, photoFileName),
+		},
+		Time:   time.Now(),
+		Masked: false,
 	}
 
 	if err = ctr.PhotoClient.Insert(&photo); err != nil {

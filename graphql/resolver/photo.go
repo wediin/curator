@@ -23,11 +23,24 @@ func (r *Resolver) Photo(ctx context.Context, args photoArgs) (*photoResolver, e
 		photo: &model.Photo{
 			ID:          photo.ID.Hex(),
 			Contributor: photo.Contributor,
-			OriginURL:   photo.OriginURL,
-			ThumbURL:    photo.ThumbURL,
-			WebviewURL:  photo.WebviewURL,
-			Time:        graphql.Time{photo.Time},
-			Masked:      photo.Masked,
+			Origin: &model.PhotoURL{
+				Width:  photo.Origin.Width,
+				Height: photo.Origin.Height,
+				URL:    photo.Origin.URL,
+			},
+
+			Thumb: &model.PhotoURL{
+				Width:  photo.Thumb.Width,
+				Height: photo.Thumb.Height,
+				URL:    photo.Thumb.URL,
+			},
+			Webview: &model.PhotoURL{
+				Width:  photo.Webview.Width,
+				Height: photo.Webview.Height,
+				URL:    photo.Webview.URL,
+			},
+			Time:   graphql.Time{photo.Time},
+			Masked: photo.Masked,
 		},
 	}, nil
 }
@@ -44,11 +57,24 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 			photo: &model.Photo{
 				ID:          photo.ID.Hex(),
 				Contributor: photo.Contributor,
-				OriginURL:   photo.OriginURL,
-				ThumbURL:    photo.ThumbURL,
-				WebviewURL:  photo.WebviewURL,
-				Time:        graphql.Time{photo.Time},
-				Masked:      photo.Masked,
+				Origin: &model.PhotoURL{
+					Width:  photo.Origin.Width,
+					Height: photo.Origin.Height,
+					URL:    photo.Origin.URL,
+				},
+
+				Thumb: &model.PhotoURL{
+					Width:  photo.Thumb.Width,
+					Height: photo.Thumb.Height,
+					URL:    photo.Thumb.URL,
+				},
+				Webview: &model.PhotoURL{
+					Width:  photo.Webview.Width,
+					Height: photo.Webview.Height,
+					URL:    photo.Webview.URL,
+				},
+				Time:   graphql.Time{photo.Time},
+				Masked: photo.Masked,
 			},
 		})
 	}
@@ -69,16 +95,22 @@ func (r *photoResolver) Contributor() *string {
 	return &r.photo.Contributor
 }
 
-func (r *photoResolver) OriginURL() *string {
-	return &r.photo.OriginURL
+func (r *photoResolver) Origin() *photoURLResolver {
+	return &photoURLResolver{
+		photoURL: r.photo.Origin,
+	}
 }
 
-func (r *photoResolver) ThumbURL() *string {
-	return &r.photo.ThumbURL
+func (r *photoResolver) Thumb() *photoURLResolver {
+	return &photoURLResolver{
+		photoURL: r.photo.Thumb,
+	}
 }
 
-func (r *photoResolver) WebviewURL() *string {
-	return &r.photo.WebviewURL
+func (r *photoResolver) Webview() *photoURLResolver {
+	return &photoURLResolver{
+		photoURL: r.photo.Webview,
+	}
 }
 
 func (r *photoResolver) Time() *graphql.Time {
