@@ -52,7 +52,8 @@ func (r *Resolver) Photos(ctx context.Context) (*[]*photoResolver, error) {
 	}
 
 	photoResolvers := make([]*photoResolver, 0)
-	for _, photo := range photos {
+	for i, _ := range photos {
+		photo := photos[len(photos)-i-1]
 		photoResolvers = append(photoResolvers, &photoResolver{
 			photo: &model.Photo{
 				ID:          photo.ID.Hex(),
