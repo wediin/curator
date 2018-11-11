@@ -7,18 +7,30 @@ import (
 	"github.com/disintegration/imaging"
 )
 
-func ResizePhoto(file multipart.File, targetPath string, width int, height int) error {
-	img, _, err := image.Decode(file)
+func ResizePhoto(imgFile multipart.File, targetPath string, maxLen int) error {
+	photoWidth, photoHeight, err := GetPhotoSize(imgFile)
 	if err != nil {
 		return err
 	}
 
-	img = imaging.Resize(img, width, height, imaging.Lanczos)
+	img, _, err := image.Decode(imgFile)
+	if err != nil {
+		return err
+	}
+
+	if photoWidth < maxLen && photoHeight < maxLen {
+		// do nothing
+	} else if photoWidth > photoHeight {
+		img = imaging.Resize(img, maxLen, 0, imaging.Lanczos)
+	} else {
+		img = imaging.Resize(img, 0, maxLen, imaging.Lanczos)
+	}
+
 	if err = imaging.Save(img, targetPath); err != nil {
 		return err
 	}
 
-	if _, err := file.Seek(0, 0); err != nil {
+	if _, err := imgFile.Seek(0, 0); err != nil {
 		return err
 	}
 

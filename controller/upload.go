@@ -28,7 +28,7 @@ type UploadController struct {
 	PhotoRouter    string
 	PhotoDir       string
 	PhotoClient    *db.PhotoClient
-	ThumbWidth     int
+	ThumbMaxLen    int
 	WebviewMaxLen  int
 }
 
@@ -71,7 +71,7 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 
-	if err = file.ResizePhoto(f, thumbFilePath, ctr.ThumbWidth, 0); err != nil {
+	if err = file.ResizePhoto(f, thumbFilePath, ctr.ThumbMaxLen); err != nil {
 		statusError(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -82,21 +82,9 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 
-	if ctr.WebviewMaxLen > photoWidth && ctr.WebviewMaxLen > photoHeight {
-		if err = file.SaveFile(f, webViewFilePath); err != nil {
-			statusError(c, http.StatusInternalServerError, err)
-			return
-		}
-	} else if photoWidth > photoHeight {
-		if err = file.ResizePhoto(f, webViewFilePath, ctr.WebviewMaxLen, 0); err != nil {
-			statusError(c, http.StatusInternalServerError, err)
-			return
-		}
-	} else {
-		if err = file.ResizePhoto(f, webViewFilePath, 0, ctr.WebviewMaxLen); err != nil {
-			statusError(c, http.StatusInternalServerError, err)
-			return
-		}
+	if err = file.ResizePhoto(f, webViewFilePath, ctr.WebviewMaxLen); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
 	}
 
 	webViewWidth, webViewHeight, err := file.GetPhotoSizeByPath(webViewFilePath)

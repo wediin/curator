@@ -16,7 +16,7 @@ var (
 	photoMongoCollection string
 	photoRouter          string
 	photoDir             string
-	thumbWidth           int
+	thumbMaxLen          int
 	webviewMaxLen        int
 )
 
@@ -34,7 +34,7 @@ var RootCmd = &cobra.Command{
 			PhotoMongoCollection: photoMongoCollection,
 			PhotoRouter:          photoRouter,
 			PhotoDir:             photoDir,
-			ThumbWidth:           thumbWidth,
+			ThumbMaxLen:          thumbMaxLen,
 			WebviewMaxLen:        webviewMaxLen,
 		})
 		if err != nil {
@@ -56,6 +56,6 @@ func init() {
 	RootCmd.Flags().StringVarP(&photoMongoCollection, "photo-mongo-collection", "", "photos", "mongo collection name for photos")
 	RootCmd.Flags().StringVarP(&photoRouter, "photo-router", "", "/photos", "router path of photos")
 	RootCmd.Flags().StringVarP(&photoDir, "photo-dir", "", "photos", "directory name to store photos under store path")
-	RootCmd.Flags().IntVarP(&thumbWidth, "thumb-width", "", 300, "width in pixel to resize photos to thumbs")
+	RootCmd.Flags().IntVarP(&thumbMaxLen, "thumb-max-len", "", 300, "max side length in pixel to resize photos to thumbs")
 	RootCmd.Flags().IntVarP(&webviewMaxLen, "webview-max-len", "", 1600, "max side length in pixel to resize photos to webview")
 }
