@@ -21,9 +21,9 @@ func ResizePhoto(imgFile multipart.File, targetPath string, maxLen int) error {
 	if photoWidth < maxLen && photoHeight < maxLen {
 		// do nothing
 	} else if photoWidth > photoHeight {
-		img = imaging.Resize(img, maxLen, 0, imaging.Lanczos)
+		img = imaging.Resize(img, maxLen, 0, imaging.NearestNeighbor)
 	} else {
-		img = imaging.Resize(img, 0, maxLen, imaging.Lanczos)
+		img = imaging.Resize(img, 0, maxLen, imaging.NearestNeighbor)
 	}
 
 	if err = imaging.Save(img, targetPath); err != nil {
