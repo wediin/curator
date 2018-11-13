@@ -1,13 +1,14 @@
 package file
 
 import (
-	"image"
 	"mime/multipart"
 	"os"
+
+	"github.com/disintegration/imageorient"
 )
 
 func GetPhotoSize(file multipart.File) (int, int, error) {
-	config, _, err := image.DecodeConfig(file)
+	config, _, err := imageorient.DecodeConfig(file)
 	if err != nil {
 		return -1, -1, err
 	}

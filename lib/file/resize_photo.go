@@ -1,9 +1,9 @@
 package file
 
 import (
-	"image"
 	"mime/multipart"
 
+	"github.com/disintegration/imageorient"
 	"github.com/disintegration/imaging"
 )
 
@@ -13,7 +13,7 @@ func ResizePhoto(imgFile multipart.File, targetPath string, maxLen int) error {
 		return err
 	}
 
-	img, _, err := image.Decode(imgFile)
+	img, _, err := imageorient.Decode(imgFile)
 	if err != nil {
 		return err
 	}
