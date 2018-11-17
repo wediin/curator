@@ -30,6 +30,7 @@ func newRouter(c *Config) (*gin.Engine, error) {
 		PhotoClient:    photoClient,
 		ThumbMaxLen:    c.ThumbMaxLen,
 		WebviewMaxLen:  c.WebviewMaxLen,
+		SizeMax:        c.SizeMax,
 	}
 	graphql := &controller.GraphqlController{
 		PhotoClient: photoClient,

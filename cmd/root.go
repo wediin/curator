@@ -18,6 +18,7 @@ var (
 	photoDir             string
 	thumbMaxLen          int
 	webviewMaxLen        int
+	sizeMax              int
 )
 
 var RootCmd = &cobra.Command{
@@ -36,6 +37,7 @@ var RootCmd = &cobra.Command{
 			PhotoDir:             photoDir,
 			ThumbMaxLen:          thumbMaxLen,
 			WebviewMaxLen:        webviewMaxLen,
+			SizeMax:              sizeMax,
 		})
 		if err != nil {
 			return err
@@ -58,4 +60,5 @@ func init() {
 	RootCmd.Flags().StringVarP(&photoDir, "photo-dir", "", "photos", "directory name to store photos under store path")
 	RootCmd.Flags().IntVarP(&thumbMaxLen, "thumb-max-len", "", 300, "max side length in pixel to resize photos to thumbs")
 	RootCmd.Flags().IntVarP(&webviewMaxLen, "webview-max-len", "", 1600, "max side length in pixel to resize photos to webview")
+	RootCmd.Flags().IntVarP(&sizeMax, "size-max", "", 20*1024*1024, "max upload file size in byte")
 }

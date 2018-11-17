@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -22,6 +24,8 @@ const (
 	webViewPath          = "webview"
 )
 
+var ErrMaxSize = errors.New("controller: Exceed maxsize")
+
 type UploadController struct {
 	Url            string
 	PhotoStorePath string
@@ -30,6 +34,7 @@ type UploadController struct {
 	PhotoClient    *db.PhotoClient
 	ThumbMaxLen    int
 	WebviewMaxLen  int
+	SizeMax        int
 }
 
 func (ctr *UploadController) PostController(c *gin.Context) {
@@ -39,6 +44,11 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 		return
 	}
 	defer f.Close()
+
+	if err = ctr.checkLimit(handler); err != nil {
+		statusError(c, http.StatusInternalServerError, err)
+		return
+	}
 
 	originStorePath := filepath.Join(ctr.PhotoStorePath, originPath)
 	thumbStorePath := filepath.Join(ctr.PhotoStorePath, thumbPath)
@@ -121,4 +131,11 @@ func (ctr *UploadController) PostController(c *gin.Context) {
 	}
 
 	statusOK(c, http.StatusOK, "upload successful")
+}
+
+func (ctr *UploadController) checkLimit(header *multipart.FileHeader) error {
+	if header.Size >= int64(ctr.SizeMax) {
+		return ErrMaxSize
+	}
+	return nil
 }

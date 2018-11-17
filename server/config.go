@@ -12,4 +12,5 @@ type Config struct {
 	PhotoDir             string
 	ThumbMaxLen          int
 	WebviewMaxLen        int
+	SizeMax              int
 }
